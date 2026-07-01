@@ -1,0 +1,76 @@
+:root{
+  --paper:#faf6ef; --card:#fffdf9; --ink:#2b2622; --accent:#8a2b1e;
+  --muted:#8c8378; --line:#e7dfcf; --shadow:0 1px 3px rgba(80,60,30,.08);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
+  line-height:1.5;
+}
+
+header{max-width:840px; margin:0 auto; padding:2.6rem 1.2rem 1rem; text-align:center}
+h1{font-size:2.5rem; margin:0 0 .2rem; letter-spacing:.4px; font-weight:700}
+.tagline{color:var(--muted); font-style:italic; margin:.2rem auto 1.5rem; max-width:34em}
+
+#q{
+  width:100%; max-width:640px; padding:.75rem 1.1rem; font-size:1.05rem;
+  font-family:inherit; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow);
+}
+#q:focus{outline:none; border-color:var(--accent)}
+
+#filters{margin:1.1rem 0 .3rem}
+.veg-toggle{display:inline-flex; align-items:center; gap:.4rem; margin-bottom:.7rem;
+  font-size:.9rem; color:var(--ink); cursor:pointer}
+#chips{display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center}
+.chip{
+  padding:.28rem .75rem; border:1px solid var(--line); border-radius:999px;
+  background:var(--card); cursor:pointer; font-family:inherit; font-size:.82rem; color:var(--ink);
+}
+.chip:hover{border-color:var(--accent)}
+.chip.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+#count{color:var(--muted); font-size:.85rem; margin:.7rem 0 0}
+
+main{max-width:840px; margin:0 auto; padding:.5rem 1.2rem 3rem}
+#results{list-style:none; padding:0; margin:0}
+#results li{
+  padding:.85rem .5rem; border-bottom:1px solid var(--line); cursor:pointer; border-radius:6px;
+}
+#results li:hover{background:var(--card)}
+#results li.note{cursor:default; color:var(--muted); font-size:.85rem; font-style:italic}
+#results li.note:hover{background:none}
+.rtitle{font-size:1.18rem; color:var(--accent)}
+.rmeta{color:var(--muted); font-size:.82rem; margin-top:.1rem}
+
+#recipe{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:1.7rem 1.9rem; box-shadow:var(--shadow);
+}
+#recipe h2{color:var(--accent); margin:.1rem 0 .1rem; font-size:1.9rem; line-height:1.15}
+#recipe .by{color:var(--muted); font-style:italic; margin:.3rem 0 1.3rem}
+#recipe h3{
+  font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--line); padding-bottom:.25rem; margin:1.5rem 0 .6rem;
+}
+#recipe ul,#recipe ol{padding-left:1.35rem; margin:.4rem 0}
+#recipe li{margin:.35rem 0}
+.back{
+  display:inline-block; margin-bottom:1rem; color:var(--accent); cursor:pointer;
+  background:none; border:none; font:inherit; padding:0;
+}
+.back:hover{text-decoration:underline}
+.badge{font-size:.68rem; padding:.12rem .5rem; border-radius:5px; margin-left:.6rem;
+  vertical-align:middle; letter-spacing:.03em; text-transform:uppercase}
+.badge.veg{background:#e5f0e0; color:#2f6b2f}
+.badge.nonveg{background:#f5e2df; color:#8a2b1e}
+
+footer{text-align:center; color:var(--muted); font-size:.78rem; padding:1.5rem 1rem 3rem}
+
+@media (max-width:520px){
+  h1{font-size:2rem}
+  header{padding-top:1.8rem}
+  #recipe{padding:1.3rem 1.2rem}
+}
