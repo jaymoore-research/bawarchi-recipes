@@ -70,7 +70,7 @@ while IFS=$'\t' read -r fname ts orig; do
   sz=$([ -f "$DEST/$fname" ] && wc -c < "$DEST/$fname" || echo 0)
   echo -e "$fname\t$status\t$sz\t$snap" >> "$MANIFEST"
   [ $((i % 100)) -eq 0 ] && echo "[$i/$total] got=$got (fallback=$via_fallback) skip=$skip unrec=$unrec last=$fname"
-  sleep 0.7
+  sleep "${SLEEP:-0.7}"
 done < "$WORKLIST"
 echo "DONE: total=$total got=$got (via fallback=$via_fallback) skip=$skip unrecoverable=$unrec"
 echo "unrecoverable list: $UNREC"
