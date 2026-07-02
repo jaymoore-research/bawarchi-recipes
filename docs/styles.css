@@ -1,6 +1,7 @@
 :root{
-  --paper:#faf6ef; --card:#fffdf9; --ink:#2b2622; --accent:#8a2b1e;
-  --muted:#8c8378; --line:#e7dfcf; --shadow:0 1px 3px rgba(80,60,30,.08);
+  /* Original bawarchi.com palette: papaya-whip cream, peach, #880000 maroon. */
+  --paper:#fdf3e2; --card:#fffdf6; --ink:#2b2521; --accent:#880000;
+  --peach:#ffdab9; --muted:#9a8f7f; --line:#ecdcc4; --shadow:0 1px 3px rgba(90,50,20,.10);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -10,9 +11,11 @@ body{
   line-height:1.5;
 }
 
-header{max-width:900px; margin:0 auto; padding:1.1rem 1.2rem .5rem; text-align:center}
-h1{font-size:1.6rem; margin:0 0 .1rem; letter-spacing:.3px; font-weight:700}
-.tagline{color:var(--muted); font-style:italic; font-size:.82rem; margin:.1rem auto .7rem; max-width:40em}
+header{max-width:900px; margin:0 auto; padding:1.1rem 1.2rem .6rem; text-align:center;
+  border-bottom:3px double var(--peach)}
+h1{font-size:1.7rem; margin:0 0 .1rem; letter-spacing:.3px; font-weight:700; color:var(--accent)}
+.tagline{color:var(--muted); font-style:italic; font-size:.82rem; margin:.1rem auto .7rem; max-width:44em}
+.aboutlink{color:var(--accent); text-decoration:underline; font-style:normal; white-space:nowrap}
 
 #q{
   width:100%; max-width:560px; padding:.5rem .9rem; font-size:.95rem;
@@ -22,17 +25,24 @@ h1{font-size:1.6rem; margin:0 0 .1rem; letter-spacing:.3px; font-weight:700}
 #q:focus{outline:none; border-color:var(--accent)}
 
 #filters{margin:.6rem 0 .2rem}
-.veg-toggle{display:inline-flex; align-items:center; gap:.35rem; margin-bottom:.45rem;
+.veg-toggle{display:inline-flex; align-items:center; gap:.35rem; margin-bottom:.55rem;
   font-size:.82rem; color:var(--ink); cursor:pointer}
-#chips{display:flex; flex-wrap:wrap; gap:.3rem; justify-content:center}
+
+/* Table-of-contents nav: a labelled row per meta-group. */
+#chips{max-width:740px; margin:0 auto; text-align:left}
+.navgroup{display:flex; gap:.6rem; align-items:baseline; margin:.22rem 0}
+.navgroup:first-child{justify-content:center; margin-bottom:.35rem}
+.navlabel{flex:0 0 7.5em; text-align:right; font-size:.66rem; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--muted); padding-top:.2rem}
+.navchips{display:flex; flex-wrap:wrap; gap:.3rem}
 .chip{
-  padding:.18rem .6rem; border:1px solid var(--line); border-radius:999px;
-  background:var(--card); cursor:pointer; font-family:inherit; font-size:.75rem; color:var(--ink);
+  padding:.16rem .58rem; border:1px solid var(--line); border-radius:999px;
+  background:var(--card); cursor:pointer; font-family:inherit; font-size:.74rem; color:var(--ink);
 }
 .chip:hover{border-color:var(--accent)}
 .chip.active{background:var(--accent); color:#fff; border-color:var(--accent)}
 
-#count{color:var(--muted); font-size:.78rem; margin:.45rem 0 0}
+#count{color:var(--muted); font-size:.78rem; margin:.55rem 0 0; text-align:center}
 
 main{max-width:1180px; margin:0 auto; padding:.5rem 1.2rem 3rem}
 
@@ -54,18 +64,20 @@ main{max-width:1180px; margin:0 auto; padding:.5rem 1.2rem 3rem}
 .wall .rt.nv::after{content:"·"; color:#b5482f; margin-left:.28em; font-weight:700}
 .note{text-align:center; color:var(--muted); font-style:italic; padding:2rem}
 
-#recipe{
+#recipe,#about{
   background:var(--card); border:1px solid var(--line); border-radius:12px;
-  padding:1.7rem 1.9rem; box-shadow:var(--shadow);
+  padding:1.7rem 1.9rem; box-shadow:var(--shadow); max-width:760px; margin:0 auto;
 }
-#recipe h2{color:var(--accent); margin:.1rem 0 .1rem; font-size:1.9rem; line-height:1.15}
+#recipe h2,#about h2{color:var(--accent); margin:.1rem 0 .1rem; font-size:1.9rem; line-height:1.15}
 #recipe .by{color:var(--muted); font-style:italic; margin:.3rem 0 1.3rem}
-#recipe h3{
+#recipe h3,#about h3{
   font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
   border-bottom:1px solid var(--line); padding-bottom:.25rem; margin:1.5rem 0 .6rem;
 }
-#recipe ul,#recipe ol{padding-left:1.35rem; margin:.4rem 0}
-#recipe li{margin:.35rem 0}
+#recipe ul,#recipe ol,#about ul{padding-left:1.35rem; margin:.4rem 0}
+#recipe li,#about li{margin:.35rem 0}
+#about p{margin:.6rem 0; line-height:1.6}
+#about .note{text-align:left; padding:.6rem 0 0; font-size:.85rem}
 .back{
   display:inline-block; margin-bottom:1rem; color:var(--accent); cursor:pointer;
   background:none; border:none; font:inherit; padding:0;
@@ -78,8 +90,10 @@ main{max-width:1180px; margin:0 auto; padding:.5rem 1.2rem 3rem}
 
 footer{text-align:center; color:var(--muted); font-size:.78rem; padding:1.5rem 1rem 3rem}
 
-@media (max-width:520px){
-  h1{font-size:2rem}
-  header{padding-top:1.8rem}
-  #recipe{padding:1.3rem 1.2rem}
+@media (max-width:560px){
+  #recipe,#about{padding:1.3rem 1.2rem}
+  #chips{max-width:100%}
+  .navgroup{flex-direction:column; gap:.15rem; margin:.5rem 0}
+  .navgroup:first-child{align-items:center}
+  .navlabel{flex:none; text-align:left; padding-top:0}
 }

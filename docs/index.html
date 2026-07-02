@@ -10,7 +10,7 @@
 <header>
   <h1>The Bawarchi Recipe Collection</h1>
   <p class="tagline">Home recipes sent in by readers of <em>bawarchi.com</em>, c.&nbsp;2001&ndash;2008,
-     recovered from the Internet&nbsp;Archive.</p>
+     recovered from the Internet&nbsp;Archive. <a class="aboutlink" href="#/about">About&nbsp;this&nbsp;collection</a></p>
   <input id="q" type="search" placeholder="Search recipes, ingredients, cooks…" autofocus autocomplete="off">
   <div id="filters">
     <label class="veg-toggle"><input type="checkbox" id="vegOnly"> Vegetarian only</label>
@@ -21,8 +21,44 @@
 <main>
   <div id="results"></div>
   <article id="recipe" hidden></article>
+  <article id="about" hidden>
+    <button class="back">&larr; Back</button>
+    <h2>About this collection</h2>
+    <p>In the early 2000s, <em>bawarchi.com</em> ran a <strong>Readers' Contributions</strong>
+       section: home cooks across India and the diaspora sent in their own recipes, each with
+       the cook's name. The site is long gone, and these recipes were never in any book. This
+       is that collection, rebuilt.</p>
+
+    <h3>Recovered from the Wayback Machine</h3>
+    <p>Every recipe here was pulled from the Internet Archive's snapshots of bawarchi.com.
+       Nothing was rewritten: the ingredients and method are exactly as the original cooks
+       submitted them, quirks and all.</p>
+
+    <h3>The snapshots ("freezes")</h3>
+    <p>The archive froze the site at different moments, and each freeze captured a different
+       slice:</p>
+    <ul>
+      <li><strong>2001</strong> — the main freeze. Clean, complete pages; the bulk of the
+          collection and the source of the original category listings.</li>
+      <li><strong>~2004</strong> — a fallback freeze. When a recipe's newest snapshot was a
+          broken stub, the recovery reached back to the closest 2004 capture instead.</li>
+      <li><strong>2007&ndash;2008</strong> — the "sify" era, after bawarchi moved to
+          sify.com. Many of these later freezes truncated mid-page before the recipe, so they
+          were only kept when they still carried the full method.</li>
+    </ul>
+
+    <h3>How complete is it?</h3>
+    <p><strong>5,806 recipes</strong> — about <strong>99%</strong> of every recipe the archive
+       still holds. Around 76 were only ever frozen as truncated stubs and can't be fully
+       recovered; they're left out rather than shown half-finished. Categories come from the
+       site's own index pages, filled in with keyword matching for later recipes the indexes
+       never listed.</p>
+
+    <p class="note">Recipes are readers' own and were never tested by bawarchi — cook with a
+       little judgement.</p>
+  </article>
 </main>
-<footer>Recovered from the Wayback Machine · recipes are readers' own, untested.</footer>
+<footer>Recovered from the Wayback Machine · <a href="#/about">about this collection</a> · recipes are readers' own, untested.</footer>
 <script src="app.js"></script>
 </body>
 </html>

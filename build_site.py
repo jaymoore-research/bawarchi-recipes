@@ -51,8 +51,11 @@ def category_map():
     for r, cs in cats_for.items():
         if "south" in cs:
             south.add(r)
-        known = [c for c in cs if c in CAT_PRIORITY]
-        primary[r] = min(known, key=lambda c: CAT_PRIORITY[c]) if known else "assorted"
+        # "assorted" is the site's own junk-drawer index; ignore it as a primary so
+        # those recipes get real categories via inference. Likewise a recipe listed
+        # only in the cross-cutting "south" index has no known primary.
+        known = [c for c in cs if c in CAT_PRIORITY and c != "assorted"]
+        primary[r] = min(known, key=lambda c: CAT_PRIORITY[c]) if known else None
     return primary, south
 
 
@@ -154,38 +157,136 @@ INFER_RULES = [
     ("paneer",    ["paneer"]),
     ("soya",      ["tofu", "soya", "soy "]),
     ("mushroom",  ["mushroom"]),
-    ("dosas",     ["dosa", "uttapam", "uthappam", "appam", "pesarattu", "adai", "paniyaram"]),
-    ("pakora",    ["pakora", "pakoda", "bajji", "bonda", "vada", "vadai", "cutlet", "bhaji"]),
+    ("dosas",     ["dosa", "uttapam", "uttappam", "uthappam", "appam", "pesarattu", "adai",
+                   "paniyaram", "vellayappam", "neer dosa", "pancake"]),
+    ("pakora",    ["pakora", "pakoda", "bajji", "bonda", "vada", "vadai", "cutlet", "bhaji",
+                   "kodbale", "kodubale", "nippattu", "thattai", "murukku", "chakli", "ribbon"]),
     ("rice",      ["biryani", "biriyani", "pulao", "pulav", "pongal", "fried rice",
-                   "bhath", "bath", "rice", "khichdi", "kichadi"]),
+                   "bhath", "bath", "rice", "khichdi", "kichadi", "pulihora", "puliyodarai",
+                   "puliogare", "chitranna", "bisibele", "pulihara"]),
     ("roti",      ["roti", "paratha", "parantha", "naan", "chapati", "chapathi",
                    "thepla", "poori", "puri", "kulcha", "phulka"]),
     ("bread",     ["pizza", "sandwich", "toast", "burger", "bread"]),
-    ("chutney",   ["chutney", "pickle", "thokku", "podi", "achar", "thogayal", "pachadi"]),
+    ("chutney",   ["chutney", "pickle", "thokku", "podi", "achar", "thogayal", "thuvaiyal",
+                   "pachadi", "gojju"]),
     ("raita",     ["raita"]),
     ("salad",     ["salad", "kosambari", "koshimbir"]),
-    ("soup",      ["soup", "rasam", "saaru", "shorba"]),
+    ("soup",      ["soup", "rasam", "saaru", "saar", "shorba", "pepper water", "mulligatawny"]),
     ("refreshment", ["lassi", "juice", "sharbat", "thandai", "smoothie", "milkshake",
-                     "shake", "punch", "mojito", "cooler"]),
+                     "shake", "punch", "mojito", "cooler", "buttermilk"]),
     ("cakes",     ["cake", "cookie", "biscuit", "muffin", "brownie", "pastry"]),
-    ("sweets",    ["halwa", "kheer", "payasam", "burfi", "barfi", "ladoo", "laddu",
+    ("sweets",    ["halwa", "kheer", "payasam", "payasa", "burfi", "barfi", "ladoo", "laddu",
                    "jamun", "mysore pak", "kulfi", "sweet", "pudding", "peda", "sandesh",
-                   "jalebi", "modak", "obbattu", "boli", "sheera"]),
-    ("daal",      ["daal", "dal ", "sambar", "sambhar", "kootu", "pappu", "lentil"]),
-    ("curries",   ["curry", "korma", "kurma", "masala", "gravy", "kuzhambu", "gosht"]),
-    ("snacks",    ["idli", "upma", "poha", "chaat", "tikki", "bhel", "sev", "namkeen",
-                   "murukku", "chakli", "samosa", "kachori", "roll", "spring"]),
+                   "jalebi", "modak", "obbattu", "boli", "sheera", "kozhukattai", "kozukkattai",
+                   "ariselu", "poornam"]),
+    ("daal",      ["daal", "dal ", "pappu", "lentil", "paruppu", "usili", "paruppu usili"]),
+    ("curries",   ["curry", "korma", "kurma", "masala", "gravy", "kuzhambu", "kozhambu",
+                   "kootu", "sambar", "sambhar", "kadhi", "saagu", "sagu", "pulusu",
+                   "pulissery", "morkuzhambu", "mor kuzhambu", "vatha", "avial", "aviyal",
+                   "gosht", "poriyal", "podimas", "thoran", "sabzi", "sabji"]),
+    ("snacks",    ["idli", "upma", "uppma", "poha", "chaat", "tikki", "bhel", "sev", "namkeen",
+                   "samosa", "kachori", "roll", "spring", "sevai", "tiffin", "kadabu",
+                   "puttu", "noodle", "maggi", "chips", "puff", "frankie"]),
     ("paneer",    ["cheese"]),
+    ("sweets",    ["ice cream", "icecream", "jello", "kesari", "kesari bath", "custard"]),
+    ("vegetables", ["fry", "curry leaves", "poriyal", "palya", "subzi", "subji", "koora",
+                    "keerai", "greens", "bhurta", "bhurtha", "vepudu", "vepdu"]),
+    ("curries",   ["molakootal", "molagootal", "puli", "menskai", "menaskai", "gojju",
+                   "kadhi", "miriam", "mudhe", "ragi", "koottu"]),
 ]
 
 
 def infer_category(title, text):
-    """Best-guess category slug from title (then body) for orphan recipes."""
+    """Best-guess category slug from title (then body) for orphan recipes.
+
+    Never returns 'assorted' — the final fallback is Curries, the safest home for
+    an unrecognised savoury Indian dish. Callers drop true non-recipes upstream.
+    """
     hay = (title + " " + text).lower()
     for slug, kws in INFER_RULES:
         if any(k in hay for k in kws):
             return slug
-    return "assorted"
+    return "curries"
+
+
+# Sub-buckets for the big Vegetables category, matched by specificity: a
+# distinctive vegetable is checked before a common one so e.g. "Baingan Aloo"
+# lands in Baingan, not Aloo. (Ported from the original build-book.py.)
+VEG_SUBCATS = [
+    ("Karela / Bittergourd",   ["karela", "bitter gourd", "bittergourd", "pavakkai"]),
+    ("Bhindi / Okra",          ["bhindi", "okra", "bendekai", "vendakkai", "behndi"]),
+    ("Baingan / Eggplant",     ["baingan", "baigan", "brinjal", "eggplant", "vangi", "vankaya", "kathirikai"]),
+    ("Methi & Palak (Greens)", ["methi", "palak", "spinach", "saag", "fenugreek", "amaranth", "keerai", "greens"]),
+    ("Gobi / Cauliflower",     ["gobi", "gobhi", "cauliflower"]),
+    ("Chole / Rajma / Chana",  ["chole", "chana", "channa", "chickpea", "rajma", "kidney bean"]),
+    ("Lauki / Gourds",         ["lauki", "louki", "doodhi", "ghia", "tinda", "tindora", "parwal",
+                                "turai", "ridge gourd", "bottle gourd", "snake gourd", "ash gourd",
+                                "pumpkin", "kaddu"]),
+    ("Yam, Plantain & Root",   ["yam", "plantain", "raw banana", "kachri", "arbi", "arvi",
+                                "colocasia", "suran"]),
+    ("Koftas",                 ["kofta"]),
+    ("Cabbage",                ["cabbage", "patta gobi"]),
+    ("Capsicum / Mirchi",      ["capsicum", "mirchi", "bell pepper"]),
+    ("Matar / Peas & Beans",   ["matar", "mutter", "peas", "beans", "lobia"]),
+    ("Carrot & Beetroot",      ["carrot", "gajar", "beetroot", "beet "]),
+    ("Corn",                   ["corn", "makai", "makki", "bhutta"]),
+    ("Tomato",                 ["tomato", "tamatar"]),
+    ("Aloo / Potato",          ["aloo", "potato", "alu "]),
+]
+# Reading order for display (aloo/gobi/etc. first; catch-all last).
+VEG_SUB_ORDER = [
+    "Aloo / Potato", "Baingan / Eggplant", "Bhindi / Okra", "Gobi / Cauliflower",
+    "Cabbage", "Capsicum / Mirchi", "Matar / Peas & Beans", "Chole / Rajma / Chana",
+    "Methi & Palak (Greens)", "Karela / Bittergourd", "Lauki / Gourds",
+    "Carrot & Beetroot", "Corn", "Tomato", "Yam, Plantain & Root", "Koftas",
+    "Other Vegetables",
+]
+
+
+def veg_subcat(title, text):
+    """Sub-category display name for a Vegetables recipe, or 'Other Vegetables'."""
+    hay = (title + " " + text).lower()
+    for name, kws in VEG_SUBCATS:
+        if any(k in hay for k in kws):
+            return name
+    return "Other Vegetables"
+
+
+# Sub-buckets for the vague "Regional Specialities" + "East / West / North"
+# categories, by region/cuisine. Specificity order: distinctive cuisines first.
+REGION_SUBCATS = [
+    ("Indo-Chinese",          ["manchurian", "hakka", "schezwan", "szechuan", "szechwan",
+                               "chinese", "chowmein", "chow mein", "spring roll", "hot and sour",
+                               "chilli paneer", "chilli garlic"]),
+    ("Italian & Continental", ["pasta", "pizza", "lasagn", "risotto", "spaghetti", "macaroni",
+                               "continental", "ravioli", "gnocchi", "au gratin"]),
+    ("Mexican",               ["taco", "tortilla", "salsa", "nacho", "quesadilla", "enchilada",
+                               "burrito", "mexican", "fajita"]),
+    ("Thai & East Asian",     ["thai", "pad thai", "tom yum", "teriyaki", "sushi", "kimchi"]),
+    ("Bengali",               ["bengali", "shukto", "posto", "chorchori", "luchi", "shorshe",
+                               "bhapa", "cholar", "kosha"]),
+    ("Gujarati",              ["gujarati", "dhokla", "thepla", "undhiyu", "khandvi", "fafda",
+                               "handvo", "khakhra", "gujarat"]),
+    ("Maharashtrian",         ["maharashtrian", "misal", "thalipeeth", "puran poli", "zunka",
+                               "sabudana", "kolhapuri", "amti"]),
+    ("Punjabi & North",       ["punjabi", "amritsari", "chole bhature", "sarson", "makki",
+                               "dhaba", "pindi"]),
+    ("Rajasthani",            ["rajasthani", "gatte", "ker sangri", "dal baati", "baati"]),
+    ("Kashmiri",              ["kashmiri", "rogan", "yakhni"]),
+    ("Sindhi",                ["sindhi", "sai bhaji", "koki", "sindh"]),
+    ("South Indian",          ["south indian", "andhra", "chettinad", "kerala", "tamil",
+                               "karnataka", "udupi", "mangalorean", "hyderabadi", "malabar"]),
+]
+REGION_ORDER = [name for name, _ in REGION_SUBCATS] + ["Other Regional"]
+
+
+def region_subcat(title, text):
+    """Region/cuisine sub-name for a regional recipe, or 'Other Regional'."""
+    hay = (title + " " + text).lower()
+    for name, kws in REGION_SUBCATS:
+        if any(k in hay for k in kws):
+            return name
+    return "Other Regional"
 
 
 def is_veg(primary, ingredients, method):
@@ -212,16 +313,38 @@ def main():
         if rec is None or not rec["title"] or rec["title"] == "Untitled":
             dropped += 1
             continue
+        # Sify-era listing/landing pages scraped as recipes: boilerplate pipe title,
+        # no method. Not real recipes -> drop.
+        if "|" in rec["title"] or not rec["method"] and "recipes" in rec["title"].lower():
+            dropped += 1
+            continue
         fname = path.name.lower()
         prim = primary.get(fname)
         if prim is None:   # not listed in any category index -> infer from the dish
             prim = infer_category(rec["title"], " ".join(rec["ingredients"][:6]))
+        # Strong title corrections that beat a loose/ambiguous index listing —
+        # these dishes get lumped into Snacks or Salads by the source indexes.
+        tl = rec["title"].lower()
+        if "raita" in tl:
+            prim = "raita"
+        elif any(k in tl for k in ("vada", "vadai", "bonda", "bajji", "pakora",
+                                   "pakoda", "cutlet")):
+            prim = "pakora"
+        elif "pachadi" not in tl and ("pickle" in tl or "thokku" in tl):
+            prim = "chutney"
+        blurb = rec["title"] + " " + " ".join(rec["ingredients"][:6])
+        sub = None
+        if prim == "vegetables":
+            sub = veg_subcat(rec["title"], blurb)
+        elif prim in ("regional", "east"):
+            sub = region_subcat(rec["title"], blurb)
         recipes.append({
             "id": int(re.search(r"\d+", fname).group()),
             "title": rec["title"],
             "contributor": rec["contributor"],
             "category": prim,
             "categoryName": CAT_NAME.get(prim, "Assorted"),
+            "sub": sub,
             "south": fname in south,
             "isVeg": is_veg(prim, rec["ingredients"], rec["method"]),
             "ingredients": rec["ingredients"],
