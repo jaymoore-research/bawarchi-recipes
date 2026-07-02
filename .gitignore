@@ -1,7 +1,6 @@
 .DS_Store
 .gstack/
 /tmp/
-site/recipes.json
 __pycache__/
 .pytest_cache/
 contribution/*.new

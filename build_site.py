@@ -143,6 +143,51 @@ def extract_recipe(path):
 
 # --- assembly ------------------------------------------------------------
 
+# Title-keyword inference for recipes not listed in any category index page
+# (mostly post-2001 additions). Checked in priority order; distinctive/non-veg
+# cues first so e.g. "Chicken Biryani" lands in chicken, not rice.
+INFER_RULES = [
+    ("chicken",   ["chicken", "murgh", "tandoori chicken"]),
+    ("seafood",   ["fish", "prawn", "shrimp", "crab", "lobster", "squid", "meen"]),
+    ("redmeat",   ["mutton", "lamb", "beef", "pork", "keema", "kheema", "goat"]),
+    ("egg",       ["egg", "omelet", "omelette", "anda"]),
+    ("paneer",    ["paneer"]),
+    ("soya",      ["tofu", "soya", "soy "]),
+    ("mushroom",  ["mushroom"]),
+    ("dosas",     ["dosa", "uttapam", "uthappam", "appam", "pesarattu", "adai", "paniyaram"]),
+    ("pakora",    ["pakora", "pakoda", "bajji", "bonda", "vada", "vadai", "cutlet", "bhaji"]),
+    ("rice",      ["biryani", "biriyani", "pulao", "pulav", "pongal", "fried rice",
+                   "bhath", "bath", "rice", "khichdi", "kichadi"]),
+    ("roti",      ["roti", "paratha", "parantha", "naan", "chapati", "chapathi",
+                   "thepla", "poori", "puri", "kulcha", "phulka"]),
+    ("bread",     ["pizza", "sandwich", "toast", "burger", "bread"]),
+    ("chutney",   ["chutney", "pickle", "thokku", "podi", "achar", "thogayal", "pachadi"]),
+    ("raita",     ["raita"]),
+    ("salad",     ["salad", "kosambari", "koshimbir"]),
+    ("soup",      ["soup", "rasam", "saaru", "shorba"]),
+    ("refreshment", ["lassi", "juice", "sharbat", "thandai", "smoothie", "milkshake",
+                     "shake", "punch", "mojito", "cooler"]),
+    ("cakes",     ["cake", "cookie", "biscuit", "muffin", "brownie", "pastry"]),
+    ("sweets",    ["halwa", "kheer", "payasam", "burfi", "barfi", "ladoo", "laddu",
+                   "jamun", "mysore pak", "kulfi", "sweet", "pudding", "peda", "sandesh",
+                   "jalebi", "modak", "obbattu", "boli", "sheera"]),
+    ("daal",      ["daal", "dal ", "sambar", "sambhar", "kootu", "pappu", "lentil"]),
+    ("curries",   ["curry", "korma", "kurma", "masala", "gravy", "kuzhambu", "gosht"]),
+    ("snacks",    ["idli", "upma", "poha", "chaat", "tikki", "bhel", "sev", "namkeen",
+                   "murukku", "chakli", "samosa", "kachori", "roll", "spring"]),
+    ("paneer",    ["cheese"]),
+]
+
+
+def infer_category(title, text):
+    """Best-guess category slug from title (then body) for orphan recipes."""
+    hay = (title + " " + text).lower()
+    for slug, kws in INFER_RULES:
+        if any(k in hay for k in kws):
+            return slug
+    return "assorted"
+
+
 def is_veg(primary, ingredients, method):
     if primary in NONVEG_CATS:
         return False
@@ -168,7 +213,9 @@ def main():
             dropped += 1
             continue
         fname = path.name.lower()
-        prim = primary.get(fname, "assorted")
+        prim = primary.get(fname)
+        if prim is None:   # not listed in any category index -> infer from the dish
+            prim = infer_category(rec["title"], " ".join(rec["ingredients"][:6]))
         recipes.append({
             "id": int(re.search(r"\d+", fname).group()),
             "title": rec["title"],
