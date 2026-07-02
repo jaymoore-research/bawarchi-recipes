@@ -63,23 +63,35 @@ function render() {
   els.count.textContent = `${list.length.toLocaleString()} recipe${list.length === 1 ? '' : 's'}`;
 
   els.results.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  list.slice(0, 400).forEach(r => {
-    const li = document.createElement('li');
-    li.innerHTML =
-      `<div class="rtitle">${esc(r.title)}</div>` +
-      `<div class="rmeta">${r.contributor ? 'by ' + esc(r.contributor) + ' · ' : ''}` +
-      `${esc(r.categoryName)}${r.isVeg ? '' : ' · non-veg'}</div>`;
-    li.onclick = () => { location.hash = '#/recipe/' + r.id; };
-    frag.appendChild(li);
-  });
-  els.results.appendChild(frag);
-  if (list.length > 400) {
-    const li = document.createElement('li');
-    li.className = 'note';
-    li.textContent = `Showing the first 400 of ${list.length.toLocaleString()}. Refine your search to narrow it down.`;
-    els.results.appendChild(li);
-  }
+  const PAGE = 500;
+  let shown = 0;
+  const renderMore = () => {
+    const note = els.results.querySelector('.note');
+    if (note) note.remove();
+    const frag = document.createDocumentFragment();
+    list.slice(shown, shown + PAGE).forEach(r => {
+      const li = document.createElement('li');
+      li.innerHTML =
+        `<div class="rtitle">${esc(r.title)}</div>` +
+        `<div class="rmeta">${r.contributor ? 'by ' + esc(r.contributor) + ' · ' : ''}` +
+        `${esc(r.categoryName)}${r.isVeg ? '' : ' · non-veg'}</div>`;
+      li.onclick = () => { location.hash = '#/recipe/' + r.id; };
+      frag.appendChild(li);
+    });
+    els.results.appendChild(frag);
+    shown = Math.min(shown + PAGE, list.length);
+    if (shown < list.length) {
+      const remaining = list.length - shown;
+      const li = document.createElement('li');
+      li.className = 'note';
+      li.innerHTML =
+        `<button class="showmore">Show ${Math.min(PAGE, remaining).toLocaleString()} more</button>` +
+        `<span> · ${shown.toLocaleString()} of ${list.length.toLocaleString()} shown</span>`;
+      li.querySelector('.showmore').onclick = renderMore;
+      els.results.appendChild(li);
+    }
+  };
+  renderMore();
 }
 
 function showRecipe(id) {

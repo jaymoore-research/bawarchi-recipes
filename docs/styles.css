@@ -40,8 +40,13 @@ main{max-width:840px; margin:0 auto; padding:.5rem 1.2rem 3rem}
   padding:.85rem .5rem; border-bottom:1px solid var(--line); cursor:pointer; border-radius:6px;
 }
 #results li:hover{background:var(--card)}
-#results li.note{cursor:default; color:var(--muted); font-size:.85rem; font-style:italic}
+#results li.note{cursor:default; color:var(--muted); font-size:.85rem; font-style:italic; text-align:center; padding:1rem .5rem}
 #results li.note:hover{background:none}
+.showmore{
+  font-family:inherit; font-size:.9rem; font-style:normal; color:#fff; background:var(--accent);
+  border:none; border-radius:8px; padding:.5rem 1.1rem; cursor:pointer;
+}
+.showmore:hover{background:#701f14}
 .rtitle{font-size:1.18rem; color:var(--accent)}
 .rmeta{color:var(--muted); font-size:.82rem; margin-top:.1rem}
 
