@@ -16,7 +16,7 @@ from collections import defaultdict, Counter
 
 ROOT = pathlib.Path(__file__).parent
 CONTRIB = ROOT / "contribution"
-OUT = ROOT / "site" / "recipes.json"
+OUT = ROOT / "docs" / "recipes.json"
 
 CATEGORY_ORDER = [
     ("vegetables", "Vegetables"), ("paneer", "Paneer"), ("soya", "Soya & Tofu"),
