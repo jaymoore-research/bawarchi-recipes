@@ -62,36 +62,24 @@ function render() {
     matches(r, terms));
   els.count.textContent = `${list.length.toLocaleString()} recipe${list.length === 1 ? '' : 's'}`;
 
-  els.results.innerHTML = '';
-  const PAGE = 500;
-  let shown = 0;
-  const renderMore = () => {
-    const note = els.results.querySelector('.note');
-    if (note) note.remove();
-    const frag = document.createDocumentFragment();
-    list.slice(shown, shown + PAGE).forEach(r => {
-      const li = document.createElement('li');
-      li.innerHTML =
-        `<div class="rtitle">${esc(r.title)}</div>` +
-        `<div class="rmeta">${r.contributor ? 'by ' + esc(r.contributor) + ' · ' : ''}` +
-        `${esc(r.categoryName)}${r.isVeg ? '' : ' · non-veg'}</div>`;
-      li.onclick = () => { location.hash = '#/recipe/' + r.id; };
-      frag.appendChild(li);
-    });
-    els.results.appendChild(frag);
-    shown = Math.min(shown + PAGE, list.length);
-    if (shown < list.length) {
-      const remaining = list.length - shown;
-      const li = document.createElement('li');
-      li.className = 'note';
-      li.innerHTML =
-        `<button class="showmore">Show ${Math.min(PAGE, remaining).toLocaleString()} more</button>` +
-        `<span> · ${shown.toLocaleString()} of ${list.length.toLocaleString()} shown</span>`;
-      li.querySelector('.showmore').onclick = renderMore;
-      els.results.appendChild(li);
-    }
-  };
-  renderMore();
+  // Dense "wall": group by category (display order), each group a header + a
+  // multi-column flow of bare titles. Titles only — no meta — for maximum density.
+  const groups = new Map();
+  for (const r of list) {
+    let g = groups.get(r.category);
+    if (!g) { g = []; groups.set(r.category, g); }
+    g.push(r);
+  }
+  let out = '';
+  for (const slug of CATEGORY_ORDER) {
+    const items = groups.get(slug);
+    if (!items) continue;
+    out += `<section class="group"><h3 class="group-head">${esc(items[0].categoryName)}` +
+      `<span class="gc">${items.length}</span></h3><div class="wall">` +
+      items.map(r => `<a class="rt${r.isVeg ? '' : ' nv'}" data-id="${r.id}">${esc(r.title)}</a>`).join('') +
+      `</div></section>`;
+  }
+  els.results.innerHTML = out || '<p class="note">No recipes found.</p>';
 }
 
 function showRecipe(id) {
@@ -126,6 +114,10 @@ function esc(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+els.results.addEventListener('click', e => {
+  const a = e.target.closest('[data-id]');
+  if (a) location.hash = '#/recipe/' + a.dataset.id;
+});
 els.q.addEventListener('input', () => {
   if (location.hash) location.hash = '';   // leaving a recipe view resets to list
   else render();
